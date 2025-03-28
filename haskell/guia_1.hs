@@ -5,26 +5,25 @@ max2 :: (Float, Float) -> Float
 normaVectorial :: (Float, Float) -> Float
 substract :: Float -> Float -> Float
 predecesor :: Float -> Float  
-evaluarEnCero :: Num a => (a -> b) -> b
+evaluarEnCero :: (Float -> Float)-> Float
 dosVeces :: (a -> a) -> a -> a
-flipAll :: 
-flipRaro :: 
+flipAll :: [a -> b -> c] -> [b -> a -> c]
+flipRaro :: b -> (a -> b -> c) -> a -> c
 
 Para muchos casos en vez de poner Float, se deberia poner Num a -> a con el fin de que sea mas general
-II.
+II. Las que no estan currificadas son las siguientes: max2, C
+
+max2' :: Float -> Float -> Float
+max2' x y   | x >= y    = x
+            | otherwise = y
+
+normaVectorial' :: Float -> Float -> Float
+normaVectorial' = \x y -> sqrt (x^2 + y^2)
 -}
 
-substract :: Num a => a -> a -> a
-substract = flip (-) 
+--------------------Ej2--------------------
+curry' :: ((a, b) -> c) -> a -> b -> c
+curry' f x y    = f (x, y) 
 
-predecesor :: Float -> Float
-predecesor = substract 1
-
-evaluarEnCero :: Num a => (a -> b) -> b
-evaluarEnCero = \f -> f 0
-
-flipAll :: [a -> b -> c] -> [b -> a -> c]
-flipAll = map flip 
-
-dosVeces :: (a -> a) -> a -> a
-dosVeces = \f -> f . f
+un_curry' :: (a -> b -> c) -> (a, b) -> c
+un_curry' f (x,y) = f x y
