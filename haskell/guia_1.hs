@@ -81,6 +81,10 @@ entrelazar (x:xs) = \ys -> if null ys then x : entrelazar xs [] else x : head ys
 
 -- TODO: FALTA HACER ENTRELAZAR
 
+entrelazar' :: [a] -> [a] -> [a]
+entrelazar' = foldr f (id) 
+            where f = \x rec ys -> if null ys then x : rec [] else x : head ys : rec (tail ys)
+
 --------------------Ej6--------------------
 recr :: (a -> [a] -> b -> b) -> b -> [a] -> b
 recr _ z [] = z
@@ -94,4 +98,4 @@ sacarUna e = recr f []
 
 insertarOrdenado :: Ord a => a -> [a] -> [a] -- Tiene un problema con un elemento, que lo pone atras. Sino funca bien.
 insertarOrdenado e = recr f [e]
-                    where f = (\x xs rec -> if x <= e && (if null xs then True else head xs >= e) then x:e:xs else x:rec)
+                    where f = (\x xs rec -> if x >= e then e:x:xs else x:rec)
