@@ -56,7 +56,7 @@ sumasParciales ls   = fst $ foldr (\x (res, lft) ->( x + sum lft : res, init lft
 sumasParciales' :: Num a => [a] -> [a]  -- Esta hecho con foldl
 sumasParciales'     = reverse . fst . foldl (\(res, acc) x ->( x + acc : res, x + acc)) ([], 0) 
 
--- IV.
+-- IV. !!! Tambien se puede hacer con foldr (-) 0
 sumaAlt :: (Num a) => [a] -> a 
 sumaAlt = fst . foldr (\x (res, alt) -> (if alt then res - x else res + x , not alt)) (0, False) . reverse
 
@@ -97,3 +97,51 @@ sacarUna e = recr f []
 insertarOrdenado :: Ord a => a -> [a] -> [a] -- Tiene un problema con un elemento, que lo pone atras. Sino funca bien.
 insertarOrdenado e = recr f [e]
                     where f = (\x xs rec -> if x >= e then e:x:xs else x:rec)
+
+--------------------Ej7--------------------
+-- I.  
+lista_piola = [(x,y) | x <- [1..10], y <- [1..]]
+
+mapPares :: (a -> b -> c) -> [(a, b)] -> [c]
+mapPares  f = foldr g []
+            where g = \pair rec -> uncurry f pair : rec
+
+-- II.
+armarPares :: [a] -> [b] -> [(a,b)]
+armarPares  = foldr f (const [])
+            where f = \x rec ys -> if null ys then [] else (x, head ys): rec (tail ys) 
+
+-- III.
+mapDoble :: (a -> b -> c) -> [a] -> [b] -> [c]
+mapDoble f  = foldr g (const [])
+            where g = \x rec ys -> if null ys then [] else f x (head ys) : rec (tail ys)
+
+--------------------Ej8--------------------
+
+
+--------------------Ej9--------------------
+foldNat :: (Integer -> b -> b) -> b -> Integer -> b
+foldNat _ z 0 = z
+foldNat f z n = f n (foldNat f z (n-1))
+
+potencia :: Integer -> Integer -> Integer
+potencia b = foldNat f 1
+            where f = \n rec -> b * rec 
+
+--------------------Ej12--------------------
+data AB a = Nil | Bin (AB a) a (AB a) deriving Show
+
+mi_Arbol = Bin (Bin (Bin Nil 3 Nil) 9 (Bin Nil 1 Nil)) 5 (Bin (Nil) 8 (Nil))
+
+foldAB :: (b -> a -> b -> b) -> b -> AB a -> b
+foldAB _ z Nil          =  z
+foldAB f z (Bin i r d)  = f (foldAB f z i) r (foldAB f z d)
+
+recAB :: (b -> a -> b -> AB a -> b) -> b -> AB a -> b
+recAB _ z Nil           =  z
+recAB f z (Bin i r d)   = f (recAB f z i) r (recAB f z d) ab
+                    where ab = Bin i r d
+
+esNil :: AB a -> Bool
+esNil Nil   = True
+esNil ab    = False

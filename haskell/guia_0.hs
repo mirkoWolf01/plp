@@ -21,7 +21,7 @@ valorAbsoluto a | a < 0     = -a
 bisiesto :: Int -> Bool
 bisiesto a = (mod a 4 == 0) || (mod a 100 == 0 && mod a 400 == 0)
 
-factorial :: Int -> Int
+factorial :: Integer -> Integer
 factorial a | a == 0    = 1
             | otherwise = a * factorial (a-1)
 
