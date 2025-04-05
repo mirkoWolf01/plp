@@ -172,3 +172,18 @@ lABB  x (Bin _ y _) = y <= x
 --------------------Ej15--------------------
 
 data RoseTree a = Rose a [RoseTree a]   
+
+t0 = Rose 7 []
+t1 = Rose 7 [Rose 1 [], Rose 2 [],Rose 3 []]
+t2 = Rose 7 [Rose 1 [], Rose 2 [Rose 1 [Rose 1 [Rose 1 [Rose 1 [Rose 1 []]]]], Rose 5 [], Rose 9 []], Rose 3 []]
+
+foldRose :: (a -> [b] -> b) -> RoseTree a -> b
+foldRose f (Rose x xs) = f x (map (foldRose f) xs)
+
+hojas :: RoseTree a -> [a]
+hojas = foldRose f 
+        where f = \r rec -> if null rec then [r] else (concat rec)
+
+distancias :: RoseTree a -> [Int]
+distancias = foldRose f
+            where f = \_ rec -> if null rec then [0] else map ((+1) . head) rec
