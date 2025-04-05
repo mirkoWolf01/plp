@@ -104,4 +104,4 @@ negacionAB (Bin ab1 a ab2)  = (Bin (negacionAB ab1) (not a) (negacionAB ab2))
 
 productoAB :: AB Int -> Int
 productoAB  Nil             = 1
-productoAB (Bin ab1 a ab2)  = a * (productoAB ab1) * (productoAB ab2)
+productoAB (Bin ab1 a ab2)  = (productoAB ab1) * a * (productoAB ab2)

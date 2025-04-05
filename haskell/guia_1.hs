@@ -100,8 +100,6 @@ insertarOrdenado e = recr f [e]
 
 --------------------Ej7--------------------
 -- I.  
-lista_piola = [(x,y) | x <- [1..10], y <- [1..]]
-
 mapPares :: (a -> b -> c) -> [(a, b)] -> [c]
 mapPares  f = foldr g []
             where g = \pair rec -> uncurry f pair : rec
@@ -131,17 +129,46 @@ potencia b = foldNat f 1
 --------------------Ej12--------------------
 data AB a = Nil | Bin (AB a) a (AB a) deriving Show
 
-mi_Arbol = Bin (Bin (Bin Nil 3 Nil) 9 (Bin Nil 1 Nil)) 5 (Bin (Nil) 8 (Nil))
-
+-- I.  
 foldAB :: (b -> a -> b -> b) -> b -> AB a -> b
 foldAB _ z Nil          =  z
 foldAB f z (Bin i r d)  = f (foldAB f z i) r (foldAB f z d)
 
-recAB :: (b -> a -> b -> AB a -> b) -> b -> AB a -> b
+recAB :: (b -> a -> b -> AB a -> AB a -> b) -> b -> AB a -> b
 recAB _ z Nil           =  z
-recAB f z (Bin i r d)   = f (recAB f z i) r (recAB f z d) ab
-                    where ab = Bin i r d
+recAB f z (Bin i r d)   = f (recAB f z i) r (recAB f z d) i d
 
+-- II.  
 esNil :: AB a -> Bool
 esNil Nil   = True
 esNil ab    = False
+
+altura :: AB a -> Integer
+altura  = foldAB f 0 
+        where f = \reci _ recd ->  max reci recd + 1
+
+cantNodos :: AB a -> Integer
+cantNodos  = foldAB f 0 
+            where f = \reci _ recd -> reci + recd + 1
+
+-- III.  
+mejorSegunAB :: (a -> a -> Bool) -> AB a -> a
+mejorSegunAB f (Bin i r d)= foldAB g r (Bin i r d)
+            where g = \reci r recd ->   if f r reci && f r recd then r else if (f reci r) && (f reci recd) then reci else recd
+
+-- IV.  
+esABB :: Ord a => AB a -> Bool
+esABB = recAB (\reci r recd i d -> lABB r i && rABB r d && recd && reci ) True 
+
+rABB :: Ord a => a -> AB a -> Bool
+rABB _ Nil = True
+rABB x (Bin _ y _) = x <= y
+
+lABB :: Ord a => a -> AB a -> Bool
+lABB  _ Nil = True
+lABB  x (Bin _ y _) = y <= x
+
+
+--------------------Ej15--------------------
+
+data RoseTree a = Rose a [RoseTree a]   
