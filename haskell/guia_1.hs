@@ -56,20 +56,23 @@ sumasParciales ls   = fst $ foldr (\x (res, lft) ->( x + sum lft : res, init lft
 sumasParciales' :: Num a => [a] -> [a]  -- Esta hecho con foldl
 sumasParciales'     = reverse . fst . foldl (\(res, acc) x ->( x + acc : res, x + acc)) ([], 0) 
 
--- IV. !!! Tambien se puede hacer con foldr (-) 0
+-- IV.
 sumaAlt :: (Num a) => [a] -> a 
 sumaAlt = fst . foldr (\x (res, alt) -> (if alt then res - x else res + x , not alt)) (0, False) . reverse
 
--- V.
 sumaAlt' :: (Num a) => [a] -> a 
-sumaAlt' = fst . foldr (\x (res, alt) -> (if alt then res - x else res + x , not alt)) (0, False)
+sumaAlt' = foldr (-) 0
+
+-- V.
+sumaAltRev :: (Num a) => [a] -> a 
+sumaAltRev = fst . foldr (\x (res, alt) -> (if alt then res - x else res + x , not alt)) (0, False)
 
 --------------------Ej4--------------------
 -- I.
 {- permutaciones :: [a] -> [[a]]
-permutaciones [x]   = [[x]]
-permutaciones ls    = concatMap (\x -> [[x]]) ls  -}
-
+permutaciones = foldr f [[]] 
+                where   f = \x  -> concatMap (\xs -> map (\i -> drop i xs ++ [x] ++ take i xs) [0.. length xs]) 
+ -}
 --------------------Ej5--------------------
 elementosEnPosicionesPares :: [a] -> [a]    -- No esta hecho con recursion estructural, debido a que se modifica xs al hacer la recursion
 elementosEnPosicionesPares [] = []
@@ -143,8 +146,8 @@ esNil :: AB a -> Bool
 esNil Nil   = True
 esNil ab    = False
 
-altura :: AB a -> Integer
-altura  = foldAB f 0 
+alturaAB :: AB a -> Integer
+alturaAB  = foldAB f 0 
         where f = \reci _ recd ->  max reci recd + 1
 
 cantNodos :: AB a -> Integer
@@ -174,7 +177,7 @@ lABB  x (Bin _ y _) = y <= x
 data RoseTree a = Rose a [RoseTree a]   
 
 t0 = Rose 7 []
-t1 = Rose 7 [Rose 1 [], Rose 2 [],Rose 3 []]
+t1 = Rose 7 [Rose 1 [Rose 4 [Rose 4 [], Rose 20 []], Rose 9 [], Rose 299 []], Rose 2 [],Rose 3 []]
 t2 = Rose 7 [Rose 1 [], Rose 2 [Rose 1 [Rose 1 [Rose 1 [Rose 1 [Rose 1 []]]]], Rose 5 [], Rose 9 []], Rose 3 []]
 
 foldRose :: (a -> [b] -> b) -> RoseTree a -> b
@@ -182,8 +185,18 @@ foldRose f (Rose x xs) = f x (map (foldRose f) xs)
 
 hojas :: RoseTree a -> [a]
 hojas = foldRose f 
-        where f = \r rec -> if null rec then [r] else (concat rec)
+        where f = \r rec -> if null rec then [r] else concat rec
 
-distancias :: RoseTree a -> [Int]
-distancias = foldRose f
-            where f = \_ rec -> if null rec then [0] else map ((+1) . head) rec
+distanciasI :: RoseTree a -> [Int]       -- Devuelve solo Ints
+distanciasI = foldRose f
+            where f = \_ rec -> if null rec then [0] else map (+1) (concat rec)
+
+distanciasT ::  RoseTree a -> [(a,Int)]  -- Devuelve tuplas que son (hoja, altura)
+distanciasT rt = zip hojasList distList
+                where   hojasList = hojas rt
+                        distList  = foldRose (\_ rec -> if null rec then [0] else map (+1) (concat rec)) rt
+
+alturaRT :: RoseTree a -> Int
+alturaRT = foldRose f 
+        where f = \_ rec -> if null rec then 1 else (+1) $ maximum rec 
+
