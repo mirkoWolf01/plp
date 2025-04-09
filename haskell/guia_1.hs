@@ -67,12 +67,17 @@ sumaAlt' = foldr (-) 0
 sumaAltRev :: (Num a) => [a] -> a 
 sumaAltRev = fst . foldr (\x (res, alt) -> (if alt then res - x else res + x , not alt)) (0, False)
 
---------------------Ej4--------------------
+--------------------Ej4-------------------- Todo
 -- I.
 {- permutaciones :: [a] -> [[a]]
 permutaciones = foldr f [[]] 
                 where   f = \x  -> concatMap (\xs -> map (\i -> drop i xs ++ [x] ++ take i xs) [0.. length xs]) 
  -}
+
+prefijos :: [a] -> [[a]]
+prefijos = foldl f [[]]
+        where f = \rec x -> rec ++ [last rec ++ [x]]
+
 --------------------Ej5--------------------
 elementosEnPosicionesPares :: [a] -> [a]    -- No esta hecho con recursion estructural, debido a que se modifica xs al hacer la recursion
 elementosEnPosicionesPares [] = []
