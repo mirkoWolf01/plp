@@ -69,10 +69,15 @@ sumaAltRev = fst . foldr (\x (res, alt) -> (if alt then res - x else res + x , n
 
 --------------------Ej4-------------------- Todo
 -- I.
-{- permutaciones :: [a] -> [[a]]
+permutaciones :: [a] -> [[a]]
 permutaciones = foldr f [[]] 
-                where   f = \x  -> concatMap (\xs -> map (\i -> drop i xs ++ [x] ++ take i xs) [0.. length xs]) 
- -}
+                where   f = \x rec -> concatMap (\xs -> map (\i -> drop i xs ++ [x] ++ take i xs) [0.. length xs]) rec
+
+-- Uso listas por compresion. Pero se puede hacer con map.
+partes :: [a] -> [[a]]
+partes [] = [[]]
+partes (x:xs) = partes xs ++ [x:ys | ys <- partes xs]
+-- partes (x:xs) = partes xs ++ map ((:) x) (partes xs)
 
 prefijos :: [a] -> [[a]]
 prefijos = foldl f [[]]
@@ -123,7 +128,29 @@ mapDoble f  = foldr g (const [])
             where g = \x rec ys -> if null ys then [] else f x (head ys) : rec (tail ys)
 
 --------------------Ej8--------------------
+a :: [[Int]]
+a =     [
+        [1, 1, 1],
+        [2, 2, 2],
+        [3, 3, 3]
+        ]
 
+b :: [[Int]]
+b =     [
+        [1, 1, 8, 2],
+        [2, 8, 2,10],
+        [5, 5, 5, 7]
+        ]
+                
+sumaMat :: [[Int]] -> [[Int]] -> [[Int]]
+sumaMat ls = foldr f (const []) ls 
+                where f = \xs rec yss -> zipWith (+) xs (head yss) : rec (tail yss)
+
+transponer :: [[Int]] -> [[Int]]
+transponer  = foldr (zipWith (:)) (repeat [])
+
+-- Como zipWith corta con el tamaño del primero, dada una entrada finita va a devolver una salida finita. 
+-- Luego, ingresa el valor en cada una de las listas correspondientes.
 
 --------------------Ej9--------------------
 foldNat :: (Integer -> b -> b) -> b -> Integer -> b
@@ -133,6 +160,17 @@ foldNat f z n = f n (foldNat f z (n-1))
 potencia :: Integer -> Integer -> Integer
 potencia b = foldNat f 1
             where f = \n rec -> b * rec 
+
+--------------------Ej11--------------------
+data Polinomio a = X | Cte a | Suma (Polinomio a) (Polinomio a) | Prod (Polinomio a) (Polinomio a)
+
+poli = Suma (Prod (Prod X X) X) (Cte 4)
+
+evaluar :: Num a => a -> Polinomio a -> a
+evaluar _ (Cte m)       = m
+evaluar n X             = n
+evaluar n (Suma s1 s2)  = evaluar n s1 + evaluar n s2
+evaluar n (Prod p1 p2)  = evaluar n p1 * evaluar n p2 
 
 --------------------Ej12--------------------
 data AB a = Nil | Bin (AB a) a (AB a) deriving Show
