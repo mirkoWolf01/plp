@@ -161,6 +161,9 @@ potencia :: Integer -> Integer -> Integer
 potencia b = foldNat f 1
             where f = \n rec -> b * rec 
 
+--------------------Ej10--------------------
+-- Por varias razones, este ejercicio no va a ser resuelto. 
+
 --------------------Ej11--------------------
 data Polinomio a = X | Cte a | Suma (Polinomio a) (Polinomio a) | Prod (Polinomio a) (Polinomio a)
 
@@ -173,7 +176,7 @@ evaluar n (Suma s1 s2)  = evaluar n s1 + evaluar n s2
 evaluar n (Prod p1 p2)  = evaluar n p1 * evaluar n p2 
 
 --------------------Ej12--------------------
-data AB a = Nil | Bin (AB a) a (AB a) deriving Show
+data AB a = Nil | Bin (AB a) a (AB a) deriving (Show)
 
 -- I.  
 foldAB :: (b -> a -> b -> b) -> b -> AB a -> b
@@ -214,6 +217,51 @@ lABB :: Ord a => a -> AB a -> Bool
 lABB  _ Nil = True
 lABB  x (Bin _ y _) = y <= x
 
+--------------------Ej13--------------------
+-- I.  
+
+vac = Nil
+arbolito = Bin (Bin (Nil) 4 (Nil)) 2 (Bin (Nil) 5 (Nil))
+arbol = Bin (Bin (Bin (Nil) 1 (Nil)) 2 (Nil)) 1 (Bin (Bin (Bin (Nil) 7 (Nil)) 4 (Bin (Nil) 9 (Nil))) 3 (Bin (Nil) 5 (Bin (Nil) 10 (Nil))))
+
+ramas :: AB a -> [[a]]
+ramas = foldAB f []
+        where f = \reci r recd -> if null reci && null recd then [[r]] else map (r:) (reci ++ recd) 
+
+cantHojas :: AB a -> Int 
+cantHojas = foldAB f 0
+        where f = \reci _ recd -> if reci == 0 && recd == 0 then 1 else reci + recd 
+
+espejo :: AB a -> AB a 
+espejo  = foldAB f Nil
+        where f = \reci r recd -> Bin recd r reci 
+
+-- II.  
+mismaEstructura :: AB a -> AB b -> Bool 
+mismaEstructura ab0 ab1 = foldAB f (esNil) ab0 ab1
+                        where f  = \reci _ recd arbol -> case arbol of
+                                Nil -> False
+                                Bin izq r der -> reci izq && reci der  
+
+--------------------Ej14--------------------
+data AIH a = Hoja a | BinAIH (AIH a) (AIH a)
+
+aih0 = Hoja 2
+aih1 = BinAIH (Hoja 1) (Hoja 5)
+aih2 = BinAIH (BinAIH (Hoja 7) (Hoja 3)) (Hoja 5)
+aih3 = BinAIH (BinAIH (BinAIH (BinAIH (Hoja 10) (Hoja 0)) (Hoja 1)) (Hoja 3)) (BinAIH (Hoja 2) (BinAIH (Hoja 6) (Hoja 5)))
+
+foldAIH :: (b -> b -> b) -> (a -> b) -> AIH a -> b
+foldAIH f g aih = case aih of 
+        Hoja a -> g a
+        BinAIH i d -> f (foldAIH f g i) (foldAIH f g d)
+
+altura :: AIH a -> Integer
+altura = foldAIH f (const 1)
+        where f = \reci recd -> 1 + max reci recd
+
+tamaño :: AIH a -> Integer
+tamaño = foldAIH (+) (const 1)
 
 --------------------Ej15--------------------
 
@@ -243,3 +291,23 @@ alturaRT :: RoseTree a -> Int
 alturaRT = foldRose f 
         where f = \_ rec -> if null rec then 1 else (+1) $ maximum rec 
 
+--------------------Ej16--------------------
+--TODO
+
+--------------------Ej17--------------------
+--[ x | x <- [1..3], y <- [x..3], (x + y) `mod' 3 == 0 ]
+-- RES = [ 1, 3]
+
+--------------------Ej18--------------------
+paresDeNat::[(Int,Int)]
+paresDeNat = [ (a, b) | c <- [0..], a <- [0..c], b <- [0..c], a+b == c]
+
+--------------------Ej19--------------------
+{- 
+pitagóricas :: [(Integer, Integer, Integer)]
+pitagóricas = [(a, b, c) | a <- [1..], b <-[1..], c <- [1..], a^2 + b^2 == c^2]
+
+No esta buena, ya que nunca sale de a, osea b y c quedan en 1 eternamente. 
+-}
+pitagóricas :: [(Integer, Integer, Integer)]
+pitagóricas = [(a, b, c) | a <- [1..], b <-[1..a], c <- [1..a+b], a^2 + b^2 == c^2]
