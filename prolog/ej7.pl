@@ -12,21 +12,13 @@ partir(N, [X|L], [X|L1], L2) :-
     M is N-1,
     partir(M, L, L1, L2).
 
-borrar([], _, []).
-borrar([Y|LO], X, [Y|LSX]) :- 
-    Y \= X,
-    borrar(LO, X, LSX).
-borrar([X|LO], X, LSX) :- 
-    borrar(LO, X, LSX).
 
+borrar(LS, X, LR) :-
+    append(L1, [X|L2], LS), !,
+    append(L1, L2, LTEMP), 
+    borrar(LTEMP, X, LR).
+borrar(LS, _, LS).
 
-/* sacarDuplicados([], []).
-sacarDuplicados([X|L1], L2) :-
-    member(X, L1),
-    sacarDuplicados(L1, L2).
-sacarDuplicados([X|L1], [X|L2]) :-
-    not(member(X, L1)),
-    sacarDuplicados(L1, L2). */
 
 sacarDuplicados([], []).
 sacarDuplicados(L1, L2) :- 
@@ -38,16 +30,29 @@ sacarDuplicadosAux([X|L1], HS, L2) :-
     sacarDuplicadosAux(L1, HS, L2).
 sacarDuplicadosAux([X|L1], HS, [X|L2]) :-
     not(member(X, HS)),
-    sacarDuplicadosAux(L1, [X|HS], L2). % Esta parte es lo realmente importante
+    sacarDuplicadosAux(L1, [X|HS], L2).
 
-/* insertar(X, [], [X]).
-insertar(X, L, XL) :-
-    append(A, B, L), 
-    append(A, [X|B], XL). */
-
-/* permutacion([], []).
+permutacion([], []).
 permutacion(L1, [X|L2]) :-
-    insertar(X, L, L2),
-    permutacion(L1, LP).
-     */
+    member(X, L1),
+    borrarUno(L1, X, L1P),
+    permutacion(L1P, L2).
 
+borrarUno(LS, X, LRES) :-
+    append(L1, [X|L2], LS),
+    append(L1, L2, LRES).
+
+reparto([], _, []).
+reparto(L, N, [L1|LLISTAS]) :-
+    length([L1|LLISTAS], N),
+    append(L1, L2, L),
+    M is N-1,
+    reparto(L2, M, LLISTAS).
+
+
+repartoSinVacias([], []).
+repartoSinVacias(L, [L1|LLISTAS]) :-
+    append(L1, L2, L),
+    L1 \= [],
+    repartoSinVacias(L2, LLISTAS).
+    
